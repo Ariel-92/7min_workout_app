@@ -3,6 +3,7 @@ package com.example.a7minutesworkout
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.view.View
 import android.widget.Toast
 import com.example.a7minutesworkout.databinding.ActivityExerciseBinding
 
@@ -11,6 +12,9 @@ class ExerciseActivity : AppCompatActivity() {
 
     private var restTimer : CountDownTimer? = null
     private var restProgress : Int = 0
+
+    private var exerciseTimer : CountDownTimer? = null
+    private var exerciseProgress : Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,8 +39,20 @@ class ExerciseActivity : AppCompatActivity() {
             restTimer?.cancel()
             restProgress = 0
         }
-
+        binding?.flExcerciseView?.visibility = View.INVISIBLE
         setRestProgressBar()
+    }
+
+    private fun setupExerciseView() {
+        binding?.flProgressBar?.visibility = View.INVISIBLE
+        binding?.tvTitle?.text = "Exercise Name"
+        binding?.flExcerciseView?.visibility = View.VISIBLE
+        if(exerciseTimer != null) {
+            exerciseTimer?.cancel()
+            exerciseProgress = 0
+        }
+
+        setExerciseProgressBar()
     }
 
     private fun setRestProgressBar() {
@@ -50,9 +66,26 @@ class ExerciseActivity : AppCompatActivity() {
             }
 
             override fun onFinish() {
+                setupExerciseView()
+            }
+
+        }.start()
+    }
+
+    private fun setExerciseProgressBar() {
+        binding?.progressBarExercise?.progress = exerciseProgress
+
+        exerciseTimer = object : CountDownTimer(30000, 1000) {
+            override fun onTick(p0: Long) {
+                exerciseProgress++
+                binding?.progressBarExercise?.progress = 30 - exerciseProgress
+                binding?.tvTimerExercise?.text = (30 - exerciseProgress).toString()
+            }
+
+            override fun onFinish() {
                 Toast.makeText(
                     this@ExerciseActivity,
-                    "Timer is finished",
+                    "Exercise is finished, let's go rest view",
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -66,6 +99,11 @@ class ExerciseActivity : AppCompatActivity() {
         if(restTimer != null) {
             restTimer?.cancel()
             restProgress = 0
+        }
+
+        if(exerciseTimer != null) {
+            exerciseTimer?.cancel()
+            exerciseProgress = 0
         }
 
         binding = null
