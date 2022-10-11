@@ -1,6 +1,7 @@
 package com.example.a7minutesworkout
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
@@ -13,6 +14,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.a7minutesworkout.databinding.ActivityExerciseBinding
+import com.example.a7minutesworkout.databinding.DialogCustomBackConfirmationBinding
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -21,11 +23,11 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     private var restTimer : CountDownTimer? = null
     private var restProgress : Int = 0
-    private var restTimerDuration : Long = 1
+    private var restTimerDuration : Long = 10
 
     private var exerciseTimer : CountDownTimer? = null
     private var exerciseProgress : Int = 0
-    private var exerciseTimerDuration : Long = 1
+    private var exerciseTimerDuration : Long = 30
 
     private var exerciseList : ArrayList<ExerciseModel>? = null
     private var currentExercisePosition = -1
@@ -51,11 +53,31 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         tts = TextToSpeech(this, this)
 
         binding?.toolbarExercise?.setNavigationOnClickListener {
-            onBackPressed()
+            customDialogForBackButton()
         }
 
         setupRestView()
         setupExerciseStatusRecyclerView()
+    }
+
+    override fun onBackPressed() {
+        customDialogForBackButton()
+    }
+
+    private fun customDialogForBackButton() {
+        val customDialog = Dialog(this)
+        val dialogBinding = DialogCustomBackConfirmationBinding.inflate(layoutInflater)
+        customDialog.setContentView(dialogBinding.root)
+        customDialog.setCanceledOnTouchOutside(false)
+        dialogBinding.btnBackYes.setOnClickListener {
+            this@ExerciseActivity.finish()
+            customDialog.dismiss()
+        }
+        dialogBinding.btnBackNo.setOnClickListener {
+            customDialog.dismiss()
+        }
+
+        customDialog.show()
     }
 
     private fun setupExerciseStatusRecyclerView() {
